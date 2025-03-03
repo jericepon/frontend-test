@@ -3,17 +3,17 @@ import { computed } from "vue";
 const route = useRoute();
 
 const pageTitle = computed(() => {
-  return route.meta.title || "Default Title";
+  return route.meta.name || "Task App";
 });
 </script>
 
 <template>
   <header
-    class="relative w-full flex items-center justify-between max-h-12 h-full px-4 sm:px-6 lg:px-8"
+    class="relative w-full flex items-center justify-between max-h-12 h-full px-4 sm:px-6 lg:px-8 py-1"
   >
     <nav class="flex items-center justify-between flex-grow">
       <div class="flex justify-center items-center">
-        <span>{{ pageTitle }}</span>
+        <span class="capitalize">{{ pageTitle }}</span>
       </div>
       <UButton
         to="/"

@@ -6,7 +6,6 @@ import "~/assets/css/main.css";
 
 <template>
   <div class="flex flex-grow">
-    <!-- <UVerticalNavigation :links="vNavLinks" /> -->
     <SideBar />
     <main class="flex flex-col flex-1">
       <NavBar />

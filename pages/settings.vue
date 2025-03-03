@@ -7,15 +7,9 @@
 <script lang="ts" setup>
 useHead({
   title: "Task • Settings",
-  meta: [
-    {
-      name: "description",
-      content: "Settings page description",
-    },
-  ],
 });
 definePageMeta({
-  title: "Settings",
+  name: "settings",
 });
 </script>
 

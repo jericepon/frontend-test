@@ -1,15 +1,9 @@
 <script lang="ts" setup>
 useHead({
-  title: "Task • Dashboard",
-  meta: [
-    {
-      name: "description",
-      content: "Home page description",
-    },
-  ],
+  title: "Task • Analytics",
 });
 definePageMeta({
-  name: "dashbaord",
+  name: "analytics",
 });
 </script>
 
