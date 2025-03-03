@@ -13,14 +13,6 @@ const pageTitle = computed(() => {
   >
     <nav class="flex items-center justify-between flex-grow">
       <div class="flex justify-center items-center">
-        <UButton
-          to="/"
-          icon="i-heroicons-chevron-left"
-          :ui="{ rounded: 'w-8 h-8 p-0 flex justify-center items-center' }"
-          variant="ghost"
-          color="gray"
-          size="sm"
-        />
         <span>{{ pageTitle }}</span>
       </div>
       <UButton
