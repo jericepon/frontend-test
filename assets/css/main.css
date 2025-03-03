@@ -1,0 +1,9 @@
+body,
+html,
+#__nuxt {
+  @apply min-h-screen;
+}
+
+#__nuxt {
+  @apply flex flex-grow;
+}
