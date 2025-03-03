@@ -1,5 +1,20 @@
 <script lang="ts" setup>
+import { useAuthStore } from "~/store/auth";
+const authStore = useAuthStore();
 
+useHead({
+  title: "Todo • Login",
+});
+definePageMeta({
+  name: "dashbaord",
+  layout: "auth",
+  middleware: "guest",
+});
+
+const handleLogin = () => {
+  authStore.login();
+  navigateTo("/");
+};
 </script>
 
 <template>
@@ -8,7 +23,7 @@
     <form>
       <input type="text" placeholder="Username" />
       <input type="password" placeholder="Password" />
-      <button type="submit">Login</button>
+      <button @click="handleLogin">Login</button>
     </form>
   </div>
 </template>

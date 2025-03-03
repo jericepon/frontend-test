@@ -11,6 +11,6 @@ const props = defineProps({
     test error page
     <h1>{{ error?.statusCode }}</h1>
     <p>{{ error?.message }}</p>
-    <NuxtLink to="/">Go back home</NuxtLink>
+    <NuxtLink to="">Go back home</NuxtLink>
   </div>
 </template>

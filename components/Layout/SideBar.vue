@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const isSideBarOpen = ref(true);
+import { useAuthStore } from "~/store/auth";
+
+const authStore = useAuthStore();
+const isOpen = ref(true);
+
+const emit = defineEmits(["toggle-side-bar"]);
+
 const links = [
   [
     { label: "Dashboard", icon: "i-heroicons-home", to: "/" },
@@ -8,18 +14,28 @@ const links = [
   ],
   [
     { label: "Settings", icon: "i-heroicons-cog", to: "/settings" },
-    { label: "Logout", icon: "i-ic-outline-logout", click: () => console.log("Logout") },
+    {
+      label: "Logout",
+      icon: "i-ic-outline-logout",
+      click: () => {
+        authStore.logout();
+        navigateTo("/login");
+        window.location.reload();
+      },
+    },
   ],
 ];
 
 const toggleSideBar = () => {
-  isSideBarOpen.value = !isSideBarOpen.value;
+  isOpen.value = !isOpen.value;
+  emit("toggle-side-bar", isOpen.value);
 };
 </script>
 
 <template>
   <aside
-    class="border-r border-(--ui-border) dark:border-gray-800 px-4 pb-4 justify-between h-full flex flex-col relative"
+    class="border-r border-(--ui-border) dark:bg-gray-900 dark:border-gray-800 px-4 pb-4 justify-between h-full flex flex-col"
+    :class="{ 'w-60': isOpen, 'w-[72px]': !isOpen }"
   >
     <div class="h-12 items-center flex mb-4 sm:mb-6 lg:mb-8 cursor-pointer">
       <UAvatar
@@ -29,16 +45,14 @@ const toggleSideBar = () => {
         class="mr-2"
       />
       <span
-        class="text-gray-900 dark:text-white text-lg font-medium"
-        :class="{ hidden: !isSideBarOpen }"
+        class="text-gray-900 dark:text-white text-lg font-medium animate-[fade-in_500ms_ease-in_1]"
+        :class="{ hidden: !isOpen }"
         >John Doe</span
       >
     </div>
     <UVerticalNavigation
       :ui="{
-        wrapper: `flex-grow justify-between h-full flex flex-col ${
-          isSideBarOpen ? 'w-60' : 'w-auto'
-        }`,
+        wrapper: `flex-grow justify-between h-full flex flex-col`,
         divider: {
           wrapper: {
             base: 'hidden',
@@ -49,10 +63,12 @@ const toggleSideBar = () => {
       :links
     >
       <template #default="{ link }">
-        <span :class="{ hidden: !isSideBarOpen }">{{ link.label }}</span>
+        <span :class="{ hidden: !isOpen }" class="animate-[fade-in_500ms_ease-in_1]">{{
+          link.label
+        }}</span>
       </template>
       <template #icon="{ link }">
-        <UTooltip :text="link.label" :popper="{ placement: 'right' }" v-if="!isSideBarOpen">
+        <UTooltip :text="link.label" :popper="{ placement: 'right' }" v-if="!isOpen">
           <UIcon :name="link.icon" size="20" />
         </UTooltip>
         <UIcon :name="link.icon" size="20" v-else />
@@ -60,11 +76,10 @@ const toggleSideBar = () => {
     </UVerticalNavigation>
     <!-- SideBar Toggle -->
     <UButton
-      to="/"
-      :icon="`i-heroicons-chevron-${isSideBarOpen ? 'left' : 'right'}`"
+      :icon="`i-heroicons-chevron-${isOpen ? 'left' : 'right'}`"
       :ui="{
         rounded:
-          'w-8 h-8 p-0 flex justify-center items-center absolute top-[8px] bottom-auto m-auto left-auto -right-[15px] scale-[0.7] z-10',
+          'w-8 h-8 p-0 flex justify-center items-center absolute top-[8px] bottom-auto m-auto left-auto -right-[15px] scale-[0.7] z-20',
       }"
       variant="solid"
       color="gray"

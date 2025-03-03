@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 useHead({
-  title: "Task • Analytics",
+  title: "Todo • Analytics",
 });
 definePageMeta({
   name: "analytics",
+  middleware: "auth",
 });
 </script>
 

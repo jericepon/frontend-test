@@ -1,9 +1,27 @@
 body,
 html,
 #__nuxt {
-  @apply min-h-screen;
+  @apply max-h-screen h-full;
 }
 
 #__nuxt {
   @apply flex flex-grow;
+}
+
+:root {
+  --base-layout-width: calc(100% - 240px);
+  --app-background: var(--color-white);
+  --animate-fade-in: fade-in 1s ease-in 1;
+  .dark {
+    --app-background: var(--color-gray-900);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

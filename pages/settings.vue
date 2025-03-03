@@ -6,10 +6,11 @@
 
 <script lang="ts" setup>
 useHead({
-  title: "Task • Settings",
+  title: "TodoSettings",
 });
 definePageMeta({
   name: "settings",
+  middleware: "auth",
 });
 </script>
 

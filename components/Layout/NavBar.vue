@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useRoute } from "vue-router";
 import { computed } from "vue";
 const route = useRoute();
 
@@ -9,7 +10,7 @@ const pageTitle = computed(() => {
 
 <template>
   <header
-    class="relative w-full flex items-center justify-between max-h-12 h-full px-4 sm:px-6 lg:px-8 py-1"
+    class="bg-white dark:bg-gray-900 flex items-center justify-between max-h-12 h-full px-4 sm:px-6 lg:px-8 py-1 border-b border-(--ui-border) dark:border-gray-800"
   >
     <nav class="flex items-center justify-between flex-grow">
       <div class="flex justify-center items-center">

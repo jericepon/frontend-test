@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 useHead({
-  title: "Task • Tasks",
+  title: "Todo • Tasks",
 });
 definePageMeta({
   name: "tasks",
+  middleware: "auth",
 });
 </script>
 
