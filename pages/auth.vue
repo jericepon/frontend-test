@@ -4,16 +4,16 @@ import { useAuthStore } from "~/store/auth";
 import { useProfileStore } from "~/store/profile";
 
 const toast = useToast();
-const { $supabase } = useNuxtApp();
-const authStore = useAuthStore();
+const { supabase } = useSupabaseClient();
+const { login, logout, signUp, signInWithPassword, providerOAuth } = useAuthStore();
 const { updateProfile } = useProfileStore();
 
 const isSignUp = ref(false);
 const loading = ref(false);
 
 const schema = z.object({
+  name: z.string().optional(),
   email: z.string().email("Invalid email"),
-  name: z.string().min(2),
   password: z.string().min(8, "Must be at least 8 characters"),
 });
 
@@ -29,108 +29,36 @@ definePageMeta({
 type State = z.infer<typeof schema>;
 
 const state = reactive<State>({
-  name: undefined,
-  email: undefined,
-  password: undefined,
+  name: "",
+  email: "",
+  password: "",
 });
 
-$supabase.auth.onAuthStateChange((event, session) => {
-  if (session && session.user) authStore.login(session.user);
-  if (event === "SIGNED_OUT") authStore.logout();
-  if (event === "SIGNED_IN") {
-    navigateTo("/");
-  }
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session && session.user) login(session.user);
+  if (event === "SIGNED_OUT") logout();
+  if (event === "SIGNED_IN") navigateTo("/");
 });
 
-const passwordLogin = async () => {
-  const { data, error } = await $supabase.auth.signInWithPassword({
-    email: state.email,
-    password: state.password,
-  });
-
-  if (error) {
-    toast.add({
-      title: "Error",
-      description: error.message,
-      color: "red",
-      icon: "i-heroicons-information-circle",
-    });
-    return;
-  }
-};
-
-const oAuthLogin = async () => {
-  const { data, error } = await $supabase.auth.signInWithOAuth({
-    provider: "google",
-  });
-
-  if (error) {
-    toast.add({
-      title: "Error",
-      description: error.message,
-      color: "red",
-      icon: "i-heroicons-information-circle",
-    });
-    return;
-  }
-};
-
-const handleLogin = async (
-  validatedState: z.infer<typeof schema> | null = null,
-  oAuth: boolean = false
-) => {
+const handleLogin = async (validatedState?: z.infer<typeof schema>, oAuth: boolean = false) => {
   try {
     loading.value = true;
     if (!oAuth && validatedState) {
-      await passwordLogin();
+      await signInWithPassword(validatedState);
     } else {
-      await oAuthLogin();
+      await providerOAuth();
     }
   } catch (error) {
     console.error(error);
+    loading.value = false;
   }
-
   loading.value = false;
-};
-
-const handleSignUp = async (validatedState: State) => {
-  const { data, error } = await $supabase.auth.signUp({
-    ...validatedState,
-  });
-
-  if (error) {
-    toast.add({
-      title: "Warning",
-      description: error.message,
-      color: "orange",
-      icon: "i-heroicons-information-circle",
-    });
-  } else {
-    createProfile({
-      user_id: data.user.id,
-      name: validatedState.name,
-    }).then(() => {
-      authStore.login(data.user);
-      navigateTo("/");
-      toast.add({
-        title: "Success",
-        description: "Account created successfully",
-        color: "green",
-        icon: "i-heroicons-information-circle",
-      });
-    });
-  }
 };
 
 const onSubmit = async () => {
   const validatedState = schema.parse(state);
-  console.log(state);
 
-  try {
-    !isSignUp.value ? await handleLogin(validatedState) : await handleSignUp(validatedState);
-  } catch (error) {
-    console.error(error);
-  }
+  !isSignUp.value ? await handleLogin(validatedState) : await signUp(validatedState);
 };
 </script>
 
@@ -154,7 +82,7 @@ const onSubmit = async () => {
       <UDivider label="or" />
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit()">
         <UFormGroup label="First name" name="text" v-if="isSignUp">
-          <UInput v-model="state.first_name" />
+          <UInput v-model="state.name" />
         </UFormGroup>
 
         <UFormGroup label="Email" name="email">

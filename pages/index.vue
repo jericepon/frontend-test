@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import { useFeatureAStore } from "~/store/featureA";
-const { $supabase } = useNuxtApp();
-const featureAStore = useFeatureAStore();
-
 useHead({
   title: "Todo • Dashboard",
   meta: [

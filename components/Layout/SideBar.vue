@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/store/auth";
-import { useProfileStore } from "~/store/profile";
 
-const { $supabase } = useNuxtApp();
+const { supabase } = useSupabaseClient();
 const { user, logout } = useAuthStore();
-const { user: profile } = useProfileStore();
 const isOpen = ref(true);
 const emit = defineEmits(["toggle-side-bar"]);
-
-console.log(profile);
 
 const links = [
   [
@@ -21,16 +17,11 @@ const links = [
     {
       label: "Logout",
       icon: "i-ic-outline-logout",
-      click: () => {
-        const { error } = $supabase.auth.signOut();
-
-        if (error) {
-          console.error(error);
-          return;
-        }
-
-        logout();
-        navigateTo("/auth");
+      click: async () => {
+        supabase.auth.signOut().then(() => {
+          logout();
+          navigateTo("/auth");
+        });
       },
     },
   ],
