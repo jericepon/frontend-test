@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/store/auth";
+import logo from "~/assets/img/logo.svg";
 
 const { supabase } = useSupabaseClient();
 const { user, logout } = useAuthStore();
@@ -7,24 +8,9 @@ const isOpen = ref(true);
 const emit = defineEmits(["toggle-side-bar"]);
 
 const links = [
-  [
-    { label: "Dashboard", icon: "i-heroicons-home", to: "/" },
-    { label: "Tasks", icon: "i-heroicons-clipboard-document-list", to: "/tasks" },
-    { label: "Analytics", icon: "i-heroicons-chart-bar", to: "/analytics" },
-  ],
-  [
-    { label: "Settings", icon: "i-heroicons-cog", to: "/settings" },
-    {
-      label: "Logout",
-      icon: "i-ic-outline-logout",
-      click: async () => {
-        supabase.auth.signOut().then(() => {
-          logout();
-          navigateTo("/auth");
-        });
-      },
-    },
-  ],
+  { label: "Dashboard", icon: "i-heroicons-home", to: "/" },
+  { label: "Tasks", icon: "i-heroicons-clipboard-document-list", to: "/tasks" },
+  { label: "Analytics", icon: "i-heroicons-chart-bar", to: "/analytics" },
 ];
 
 const toggleSideBar = () => {
@@ -35,20 +21,15 @@ const toggleSideBar = () => {
 
 <template>
   <aside
-    class="border-r border-(--ui-border) dark:bg-gray-900 dark:border-gray-800 px-4 pb-4 justify-between h-full flex flex-col"
+    class="border-r border-(--ui-border) dark:bg-gray-900 dark:border-gray-800 px-4 pb-4 h-full"
     :class="{ 'w-60': isOpen, 'w-[72px]': !isOpen }"
   >
     <div class="h-12 items-center flex mb-4 sm:mb-6 lg:mb-8 cursor-pointer">
-      <UAvatar
-        size="sm"
-        :src="user?.user_metadata.avatar_url"
-        :alt="user?.user_metadata.name"
-        class="mr-2"
-      />
+      <UAvatar size="md" :src="logo" class="mr-2" />
       <span
         class="text-gray-900 dark:text-white text-lg font-medium animate-[fade-in_500ms_ease-in_1]"
         :class="{ hidden: !isOpen }"
-        >{{ user?.user_metadata.name }}</span
+        >Todo App</span
       >
     </div>
     <UVerticalNavigation
@@ -80,7 +61,7 @@ const toggleSideBar = () => {
       :icon="`i-heroicons-chevron-${isOpen ? 'left' : 'right'}`"
       :ui="{
         rounded:
-          'w-8 h-8 p-0 flex justify-center items-center absolute top-[8px] bottom-auto m-auto left-auto -right-[15px] scale-[0.7] z-20',
+          'w-8 h-8 p-0 flex justify-center items-center absolute top-0 bottom-0 m-auto left-auto -right-[15px] scale-[0.7] z-20',
       }"
       variant="solid"
       color="gray"
