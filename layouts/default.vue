@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import "~/assets/css/main.css";
+
+const toast = useToast();
+
 let sideBarOptions = {
   onToggleSideBar: (isOpen: boolean) => {
     const baseWidth = `${isOpen ? 240 : 72}px`;
@@ -22,6 +25,7 @@ let sideBarOptions = {
       </UContainer>
     </main>
   </div>
+  <UNotifications />
 </template>
 
 <style></style>

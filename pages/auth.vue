@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import { z } from "zod";
 import { useAuthStore } from "~/store/auth";
+import { useProfileStore } from "~/store/profile";
 
-const authStore = useAuthStore();
+const toast = useToast();
 const { $supabase } = useNuxtApp();
+const authStore = useAuthStore();
+const { updateProfile } = useProfileStore();
 
 const isSignUp = ref(false);
+const loading = ref(false);
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
+  name: z.string().min(2),
   password: z.string().min(8, "Must be at least 8 characters"),
 });
 
@@ -24,6 +29,7 @@ definePageMeta({
 type State = z.infer<typeof schema>;
 
 const state = reactive<State>({
+  name: undefined,
   email: undefined,
   password: undefined,
 });
@@ -31,7 +37,9 @@ const state = reactive<State>({
 $supabase.auth.onAuthStateChange((event, session) => {
   if (session && session.user) authStore.login(session.user);
   if (event === "SIGNED_OUT") authStore.logout();
-  if (event === "SIGNED_IN") navigateTo("/");
+  if (event === "SIGNED_IN") {
+    navigateTo("/");
+  }
 });
 
 const passwordLogin = async () => {
@@ -41,7 +49,12 @@ const passwordLogin = async () => {
   });
 
   if (error) {
-    console.error(error);
+    toast.add({
+      title: "Error",
+      description: error.message,
+      color: "red",
+      icon: "i-heroicons-information-circle",
+    });
     return;
   }
 };
@@ -52,7 +65,12 @@ const oAuthLogin = async () => {
   });
 
   if (error) {
-    console.error(error);
+    toast.add({
+      title: "Error",
+      description: error.message,
+      color: "red",
+      icon: "i-heroicons-information-circle",
+    });
     return;
   }
 };
@@ -62,6 +80,7 @@ const handleLogin = async (
   oAuth: boolean = false
 ) => {
   try {
+    loading.value = true;
     if (!oAuth && validatedState) {
       await passwordLogin();
     } else {
@@ -70,6 +89,8 @@ const handleLogin = async (
   } catch (error) {
     console.error(error);
   }
+
+  loading.value = false;
 };
 
 const handleSignUp = async (validatedState: State) => {
@@ -78,14 +99,32 @@ const handleSignUp = async (validatedState: State) => {
   });
 
   if (error) {
-    console.error(error);
-    return;
+    toast.add({
+      title: "Warning",
+      description: error.message,
+      color: "orange",
+      icon: "i-heroicons-information-circle",
+    });
+  } else {
+    createProfile({
+      user_id: data.user.id,
+      name: validatedState.name,
+    }).then(() => {
+      authStore.login(data.user);
+      navigateTo("/");
+      toast.add({
+        title: "Success",
+        description: "Account created successfully",
+        color: "green",
+        icon: "i-heroicons-information-circle",
+      });
+    });
   }
-  navigateTo("/");
 };
 
 const onSubmit = async () => {
   const validatedState = schema.parse(state);
+  console.log(state);
 
   try {
     !isSignUp.value ? await handleLogin(validatedState) : await handleSignUp(validatedState);
@@ -113,7 +152,11 @@ const onSubmit = async () => {
         </UButton>
       </div>
       <UDivider label="or" />
-      <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+      <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit()">
+        <UFormGroup label="First name" name="text" v-if="isSignUp">
+          <UInput v-model="state.first_name" />
+        </UFormGroup>
+
         <UFormGroup label="Email" name="email">
           <UInput v-model="state.email" />
         </UFormGroup>
@@ -122,14 +165,14 @@ const onSubmit = async () => {
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
 
-        <UButton type="submit" class="w-full justify-center">
+        <UButton type="submit" :loading class="w-full justify-center">
           {{ !isSignUp ? "Login" : "Sign up" }}
         </UButton>
 
         <div class="mt-1 text-sm text-pretty">
           {{ !isSignUp ? "Don't have an account?" : "Already have an account?" }}
           <UButton variant="link" @click="isSignUp = !isSignUp">{{
-            !isSignUp ? "Login" : "Sign up"
+            !isSignUp ? "Sign up" : "Login"
           }}</UButton>
         </div>
       </UForm>

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/store/auth";
+import { useProfileStore } from "~/store/profile";
 
 const { $supabase } = useNuxtApp();
-const authStore = useAuthStore();
-
+const { user, logout } = useAuthStore();
+const { user: profile } = useProfileStore();
 const isOpen = ref(true);
 const emit = defineEmits(["toggle-side-bar"]);
+
+console.log(profile);
 
 const links = [
   [
@@ -26,7 +29,7 @@ const links = [
           return;
         }
 
-        authStore.logout();
+        logout();
         navigateTo("/auth");
       },
     },
@@ -47,14 +50,14 @@ const toggleSideBar = () => {
     <div class="h-12 items-center flex mb-4 sm:mb-6 lg:mb-8 cursor-pointer">
       <UAvatar
         size="sm"
-        src="https://avatars.githubusercontent.com/u/739984?v=4"
-        alt="Avatar"
+        :src="user?.user_metadata.avatar_url"
+        :alt="user?.user_metadata.name"
         class="mr-2"
       />
       <span
         class="text-gray-900 dark:text-white text-lg font-medium animate-[fade-in_500ms_ease-in_1]"
         :class="{ hidden: !isOpen }"
-        >John Doe</span
+        >{{ user?.user_metadata.name }}</span
       >
     </div>
     <UVerticalNavigation
