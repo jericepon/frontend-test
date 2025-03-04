@@ -6,6 +6,6 @@ export default function (context: Context) {
 
   if (!authStore.isAuthenticated)
   {
-    return navigateTo('/login');
+    return navigateTo('/auth');
   }
 }

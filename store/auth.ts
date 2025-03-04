@@ -1,11 +1,9 @@
+import type { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: {
-    id: string;
-    name: string;
-  } | null;
+  user: User | null;
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -14,7 +12,8 @@ export const useAuthStore = defineStore('auth', {
     user: null,
   }),
   actions: {
-    login() {
+    login(user: User | null) {
+      this.user = user ? { ...user } : null;
       this.isAuthenticated = true;
     },
     logout() {

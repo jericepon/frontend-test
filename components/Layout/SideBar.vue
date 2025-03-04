@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/store/auth";
 
+const { $supabase } = useNuxtApp();
 const authStore = useAuthStore();
-const isOpen = ref(true);
 
+const isOpen = ref(true);
 const emit = defineEmits(["toggle-side-bar"]);
 
 const links = [
@@ -18,9 +19,15 @@ const links = [
       label: "Logout",
       icon: "i-ic-outline-logout",
       click: () => {
+        const { error } = $supabase.auth.signOut();
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
         authStore.logout();
-        navigateTo("/login");
-        window.location.reload();
+        navigateTo("/auth");
       },
     },
   ],
