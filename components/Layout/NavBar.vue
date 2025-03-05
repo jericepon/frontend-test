@@ -3,11 +3,16 @@ import { useRoute } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "~/store/auth";
 import { useProfileStore } from "~/store/profile";
+import {
+  injectStrict,
+  UserContextProviderKey,
+  type UserContextProviderInjection,
+} from "@supa-kit/auth-ui-vue";
 
 const route = useRoute();
 const supabase = useSupabase();
-const { clearAuth: logout, user } = useAuthStore();
-const { user_profile } = useProfileStore();
+const { clear } = useClearOnLogout();
+const { user } = injectStrict<UserContextProviderInjection>(UserContextProviderKey);
 
 const pageTitle = computed(() => {
   return route.meta.name || "Task App";
@@ -40,8 +45,8 @@ const items = ref([
       icon: "i-heroicons-arrow-left-on-rectangle",
       click: async () => {
         await supabase.auth.signOut().then(() => {
-          logout();
-          navigateTo("/auth");
+          clear();
+          navigateTo("/login");
         });
       },
     },
@@ -63,11 +68,11 @@ const items = ref([
         :ui="{ item: { disabled: 'cursor-text select-text' } }"
         :popper="{ placement: 'bottom-start' }"
       >
-        <UAvatar :src="user_profile?.avatar_url" :alt="user_profile?.name" />
+        <UAvatar :src="user?.user_metadata.picture" :alt="user?.user_metadata.name" />
 
         <template #account="{ item }">
           <div class="text-left">
-            <p class="font-medium text-gray-900 dark:text-white">{{ user_profile?.name }}</p>
+            <p class="font-medium text-gray-900 dark:text-white">{{ user?.user_metadata.name }}</p>
           </div>
         </template>
 

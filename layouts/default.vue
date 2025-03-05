@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import { UserContextProvider } from "@supa-kit/auth-ui-vue";
 import "~/assets/css/main.css";
 import { useProfileStore } from "~/store/profile";
 
-const toast = useToast();
-const supabase = useSupabase();
 const { addProfile } = useProfileStore();
+const supabaseClient = useSupabase();
 
 let sideBarOptions = {
   onToggleSideBar: (isOpen: boolean) => {
@@ -14,9 +14,7 @@ let sideBarOptions = {
 };
 
 onMounted(() => {
-  supabase.auth.getUser().then(({ data, error }) => {
-    console.log(data);
-    
+  supabaseClient.auth.getUser().then(({ data, error }) => {
     if (data.user) {
       addProfile({
         user_id: data.user?.id,
@@ -30,7 +28,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="grid flex-grow">
+  <UserContextProvider :supabaseClient class="grid flex-grow">
     <LayoutSideBar class="fixed z-20 transition-[width]" v-bind="sideBarOptions" />
     <LayoutNavBar
       class="fixed top-0 z-10 left-auto right-0 w-full max-w-[var(--base-layout-width)] transition-all"
@@ -42,8 +40,6 @@ onMounted(() => {
         <slot />
       </UContainer>
     </main>
-  </div>
-  <UNotifications />
+    <UNotifications />
+  </UserContextProvider>
 </template>
-
-<style></style>
