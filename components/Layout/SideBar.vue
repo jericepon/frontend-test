@@ -2,8 +2,8 @@
 import { useAuthStore } from "~/store/auth";
 import logo from "~/assets/img/logo.svg";
 
-const { supabase } = useSupabaseClient();
-const { user, logout } = useAuthStore();
+const supabase = useSupabase();
+const { user, clearAuth: logout } = useAuthStore();
 const isOpen = ref(true);
 const emit = defineEmits(["toggle-side-bar"]);
 

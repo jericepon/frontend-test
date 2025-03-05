@@ -3,10 +3,9 @@ import { z } from "zod";
 import { useAuthStore } from "~/store/auth";
 import { useProfileStore } from "~/store/profile";
 
-const toast = useToast();
-const { supabase } = useSupabaseClient();
-const { login, logout, signUp, signInWithPassword, providerOAuth } = useAuthStore();
-const { updateProfile } = useProfileStore();
+const supabase = useSupabase();
+const { clear } = useClearOnLogout();
+const { login, signUp, signInWithPassword, providerOAuth } = useAuthStore();
 
 const isSignUp = ref(false);
 const loading = ref(false);
@@ -35,18 +34,23 @@ const state = reactive<State>({
 });
 
 supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session);
   if (session && session.user) login(session.user);
-  if (event === "SIGNED_OUT") logout();
+  if (event === "SIGNED_OUT") clear();
   if (event === "SIGNED_IN") navigateTo("/");
+});
+
+supabase.auth.getUser().then(({ data, error }) => {
+  console.log(data);
 });
 
 const handleLogin = async (validatedState?: z.infer<typeof schema>, oAuth: boolean = false) => {
   try {
     loading.value = true;
     if (!oAuth && validatedState) {
-      await signInWithPassword(validatedState);
+      signInWithPassword(validatedState);
     } else {
-      await providerOAuth();
+      providerOAuth();
     }
   } catch (error) {
     console.error(error);

@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import "~/assets/css/main.css";
+import { useProfileStore } from "~/store/profile";
 
 const toast = useToast();
+const supabase = useSupabase();
+const { addProfile } = useProfileStore();
 
 let sideBarOptions = {
   onToggleSideBar: (isOpen: boolean) => {
@@ -9,6 +12,21 @@ let sideBarOptions = {
     document.documentElement.style.setProperty("--base-layout-width", `calc(100% - ${baseWidth})`);
   },
 };
+
+onMounted(() => {
+  supabase.auth.getUser().then(({ data, error }) => {
+    console.log(data);
+    
+    if (data.user) {
+      addProfile({
+        user_id: data.user?.id,
+        name: data.user?.user_metadata.full_name,
+        email: data.user?.user_metadata.email,
+        avatar_url: data.user?.user_metadata.avatar_url,
+      });
+    }
+  });
+});
 </script>
 
 <template>

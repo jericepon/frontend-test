@@ -2,9 +2,12 @@
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "~/store/auth";
+import { useProfileStore } from "~/store/profile";
+
 const route = useRoute();
-const { supabase } = useSupabaseClient();
-const { logout } = useAuthStore();
+const supabase = useSupabase();
+const { clearAuth: logout, user } = useAuthStore();
+const { user_profile } = useProfileStore();
 
 const pageTitle = computed(() => {
   return route.meta.name || "Task App";
@@ -54,19 +57,17 @@ const items = ref([
       <div class="flex justify-center items-center">
         <span class="capitalize">{{ pageTitle }}</span>
       </div>
+
       <UDropdown
         :items="items"
         :ui="{ item: { disabled: 'cursor-text select-text' } }"
         :popper="{ placement: 'bottom-start' }"
       >
-        <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
+        <UAvatar :src="user_profile?.avatar_url" :alt="user_profile?.name" />
 
         <template #account="{ item }">
           <div class="text-left">
-            <p class="font-medium text-gray-900 dark:text-white">Jeric Epon</p>
-            <p class="truncate">
-              {{ item.label }}
-            </p>
+            <p class="font-medium text-gray-900 dark:text-white">{{ user_profile?.name }}</p>
           </div>
         </template>
 

@@ -1,38 +1,67 @@
 import { defineStore } from 'pinia';
 
 interface UserProfile {
-  id: number;
-  user_id: string;
-  created_at: string;
-  avatar_url: string | null;
-  first_name: string;
-  last_name: string;
+  user_id?: string;
+  name: string;
+  email: string;
+  avatar_url?: string;
 }
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
-    user: null as UserProfile | null,
-    loading: false,
+    user_profile: null as UserProfile | null,
   }),
   actions: {
-    async updateProfile(user: UserProfile) {
-      this.user = user;
-      console.log(user);
-      
+    updateProfile(user: UserProfile) {
+      this.user_profile = user;
     },
     async fetchProfile(user_id: string) {
-      const { supabase } = useSupabaseClient();
+      const supabase = useSupabase();
 
       const { data, error } = await supabase
         .from('profiles')
         .select()
         .eq('user_id', user_id);
-        
-      this.user = data?.length ? data[0] : null;
-      this.loading = true;
+
+      this.user_profile = data?.length ? data[0] : null;
     },
-    clearData() {
-      this.user = null;
+    async addProfile(profile: UserProfile) {
+      const supabase = useSupabase();
+
+      //  Handling sing in / sign up with OAuth
+      // Check if the user already exists
+      this.checkUserExists(profile.email).then(({ data }) => {
+        if (data && data.length) return;
+
+        supabase
+          .from('profiles')
+          .insert([
+            profile,
+          ])
+          .select()
+          .then(({ data, error }) => {
+            data && this.handleProfieNofication({ description: 'Profile created successfully', type: 'success' });
+            error && this.handleProfieNofication({ description: error.message, type: 'error' })
+          });
+      });
+
+      this.user_profile = profile;
+    },
+    async checkUserExists(email: string) {
+      const supabase = useSupabase();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select()
+        .eq('email', email);
+
+      return { data, error };
+    },
+    handleProfieNofication(data: any) {
+      const { notify } = useAuthNotifications();
+      notify(data);
+    },
+    clearProfile() {
+      this.user_profile = null;
     },
   },
 });
